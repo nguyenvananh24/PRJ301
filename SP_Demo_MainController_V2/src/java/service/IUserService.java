@@ -11,4 +11,5 @@ public interface IUserService {
     List<User> searchActiveUsers(String keyword);
     boolean deactivateUser(int id) throws SQLException;
     boolean updateUser(User user) throws SQLException;
+    User checkLogin(String username, String password);
 }

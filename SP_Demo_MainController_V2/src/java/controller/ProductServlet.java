@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.List;
 import productDao.ProductDao;
 import java.sql.SQLException;
-
+import model.User;
 
 @WebServlet("/products")
 public class ProductServlet extends HttpServlet {
@@ -24,6 +24,12 @@ public class ProductServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        User loggedUser = (User) request.getSession().getAttribute("user");
+        if (loggedUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
         String action = request.getParameter("action");
         if (action == null) {
             action = "list";
@@ -46,6 +52,12 @@ public class ProductServlet extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        User loggedUser = (User) request.getSession().getAttribute("user");
+        if (loggedUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
         String action = request.getParameter("action");
         if ("insert".equals(action)) {
             insertProduct(request, response);
@@ -56,8 +68,21 @@ public class ProductServlet extends HttpServlet {
         }
     }
 
-  private void listProducts(HttpServletRequest request, HttpServletResponse response)
+//    private void listProducts(HttpServletRequest request, HttpServletResponse response)
+//            throws ServletException, IOException {
+//        List<Product> list = productDAO.selectAllActiveProducts();
+//        request.setAttribute("products", list);
+//        RequestDispatcher rd = request.getRequestDispatcher("/product/productList.jsp");
+//        rd.forward(request, response);
+//    }
+    private void listProducts(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        User logged = (User) request.getSession().getAttribute("user");
+        if (logged == null) {
+            response.sendRedirect(request.getContextPath() + "/users?action=loginForm");
+            return;
+        }
+
         List<Product> list = productDAO.selectAllActiveProducts();
         request.setAttribute("products", list);
         RequestDispatcher rd = request.getRequestDispatcher("/product/productList.jsp");

@@ -9,6 +9,8 @@ public interface IUserDAO {
     User selectUser(int id);
     List<User> selectAllActiveUsers();
     List<User> searchActiveUsers(String keyword);
-    boolean deactivateUser(int id) throws SQLException; // delete = update status
+    boolean deactivateUser(int id) throws SQLException; // update status
     boolean updateUser(User user) throws SQLException;
+    User checkLogin(String username, String password);
+
 }

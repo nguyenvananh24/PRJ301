@@ -5,6 +5,8 @@
     <title>User Management</title>
 </head>
 <body>
+    <!-- Sửa logout: trỏ về /logout thay vì /users?action=logout -->
+    <a href="${pageContext.request.contextPath}/logout">Logout</a>
 <center>
     <h1>User Management</h1>
     <h2><a href="<c:url value='/users?action=new'/>">Add New User</a></h2>
