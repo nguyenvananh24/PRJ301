@@ -5,7 +5,6 @@
     <title>User Management</title>
 </head>
 <body>
-    <!-- Sửa logout: trỏ về /logout thay vì /users?action=logout -->
     <a href="${pageContext.request.contextPath}/logout">Logout</a>
 <center>
     <h1>User Management</h1>

@@ -87,6 +87,7 @@ public class ProductServlet extends HttpServlet {
         request.setAttribute("products", list);
         RequestDispatcher rd = request.getRequestDispatcher("/product/productList.jsp");
         rd.forward(request, response);
+
     }
 
     private void showNewForm(HttpServletRequest request, HttpServletResponse response)
