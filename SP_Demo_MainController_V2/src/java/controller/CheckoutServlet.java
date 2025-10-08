@@ -5,6 +5,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import model.*;
 import service.*;
+import util.EmailUtil;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -27,7 +28,6 @@ public class CheckoutServlet extends HttpServlet {
         HttpSession session = request.getSession();
         User u = (User) session.getAttribute("user");
 
-        // ✅ Lấy giỏ hàng an toàn
         Object cartObj = session.getAttribute("cart");
         Map<Integer, CartItem> cart = null;
 
@@ -39,45 +39,54 @@ public class CheckoutServlet extends HttpServlet {
             }
         }
 
-        // ✅ Kiểm tra đăng nhập
         if (u == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
-        // ✅ Kiểm tra giỏ hàng
         if (cart == null || cart.isEmpty()) {
             request.setAttribute("message", "Giỏ hàng trống, không thể thanh toán!");
             request.getRequestDispatcher("/product/productList.jsp").forward(request, response);
             return;
         }
 
-        // ✅ Tính tổng tiền
         double total = 0;
         for (CartItem item : cart.values()) {
             total += item.getTotalPrice();
         }
 
-        // ✅ Áp dụng giảm giá 10%
-        total = total * 0.9;
+        String promoCode = "SALE10";
+        double discount = total * 0.1;
+        total -= discount;
 
-        // ✅ Tạo order
         Order order = new Order();
         order.setUserId(u.getId());
         order.setTotalPrice(total);
         order.setStatus("Completed");
 
-        // ✅ Tạo danh sách chi tiết sản phẩm trong giỏ
+        try {
+//            order.setPromoCode(promoCode);
+        } catch (Exception ignored) {}
+
         Map<Integer, Integer> cartItems = new HashMap<>();
         for (CartItem c : cart.values()) {
             cartItems.put(c.getProduct().getId(), c.getQuantity());
         }
 
-        // ✅ Lưu đơn hàng
         try {
             orderService.createOrder(order, cartItems);
-            session.removeAttribute("cart"); // Xóa giỏ hàng sau khi checkout xong
+            session.removeAttribute("cart"); // Xóa giỏ hàng sau khi thanh toán
+
+            String subject = "Xác nhận đơn hàng #" + order.getId();
+            String message = "Xin chào " + u.getUsername()+ ",\n\n"
+                    + "Cảm ơn bạn đã đặt hàng tại cửa hàng của chúng tôi.\n"
+                    + "Tổng tiền sau giảm giá (" + promoCode + "): " + total + " VND.\n\n"
+                    + "Đơn hàng của bạn đang được xử lý.\n\nTrân trọng!";
+            EmailUtil.sendMail(u.getEmail(), subject, message);
+
+            request.setAttribute("order", order);
             request.getRequestDispatcher("/checkout/success.jsp").forward(request, response);
+
         } catch (SQLException e) {
             e.printStackTrace();
             request.setAttribute("error", "Đặt hàng thất bại, vui lòng thử lại!");

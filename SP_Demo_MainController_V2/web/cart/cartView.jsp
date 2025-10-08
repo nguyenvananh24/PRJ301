@@ -6,7 +6,10 @@
 <h1>🛒 Your Cart</h1>
 <a href="${pageContext.request.contextPath}/products">Back to Products</a> |
 <a href="${pageContext.request.contextPath}/cart?action=clear">Clear Cart</a> |
-<a href="${pageContext.request.contextPath}/checkout">Checkout</a>
+<form action="${pageContext.request.contextPath}/checkout" method="post" style="display:inline;">
+    <button type="submit">Checkout</button>
+</form>
+
 
 <table border="1" cellpadding="5">
     <tr>
